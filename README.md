@@ -1,5 +1,5 @@
 # RSA implementation
-This project is our college assignment, which requires our to implement RSA algorithm without help of library.
+This project is our college assignment, which requires us to implement RSA algorithm without help of library.
 ## Task
 + Find a large prime number with given number of bits
 + Find GCD of 2 large numbers
