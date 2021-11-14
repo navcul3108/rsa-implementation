@@ -10,30 +10,47 @@ bool rabinMillerTest(ZZ, long);
 int main()
 {
     int bitsLenght = 500;
+    std::cout << getRandomPosiblePrime(bitsLenght);
+}
+
+ZZ getRandomNumber(long bitsLength) {
+    ZZ possiblePrime;
+    RandomBits(possiblePrime, bitsLength);
+
+    // make sure MSB & LSB value are 1
+
+    possiblePrime |= (1 << (bitsLength - 1)) | 1;
+    return possiblePrime;
+}
+
+ZZ getRandomPosiblePrime(long bitsLength) {
     int numberOfTest = 20;
     while (true) {
-        ZZ possilePrime = getRandomPosiblePrime(bitsLenght);
+        ZZ possilePrime = getRandomNumber(bitsLength);
         if (rabinMillerTest(possilePrime, numberOfTest)) {
-            std::cout << possilePrime;
-            break;
+            return possilePrime;
         }
     }
 }
 
-ZZ getRandomPosiblePrime(long bitsLenght) {
-    ZZ possiblePrime;
-    RandomBits(possiblePrime, bitsLenght);
-
-    // make sure MSB & LSB value are 1
-
-    possiblePrime |= (1 << (bitsLenght - 1)) | 1;
-    return possiblePrime;
+ZZ powerMod(const ZZ& base, const ZZ& exponent, const ZZ& module) {
+    ZZ r = ZZ(1);
+    ZZ ex = ZZ(exponent);
+    ZZ b = ZZ(base);
+    while (ex > 0) {
+        if ((ex & 1) == 1) {
+            r = r * b % module;
+        }
+        ex = ex / 2;
+        b = b * (b % module);
+    }
+    return r;
 }
 
 bool rabinMillerTest(ZZ possiblePrime, long numberOfTests) {
     ZZ q = ZZ(possiblePrime - 1);
     ZZ r = ZZ(1);
-
+    ZZ base = ZZ(2);
     // possiblePrime  - 1 = q(r^2)
 
     while ((q & 1) == 0) {
@@ -43,7 +60,7 @@ bool rabinMillerTest(ZZ possiblePrime, long numberOfTests) {
     for (long i = 1; i <= numberOfTests; ++i) {
         ZZ a;
         RandomBnd(a, possiblePrime);
-        ZZ remainder = PowerMod(a, q, possiblePrime);
+        ZZ remainder = powerMod(a, q, possiblePrime);
         if (remainder == 1 || remainder == (possiblePrime - 1)) {
             continue;
         }
@@ -51,8 +68,7 @@ bool rabinMillerTest(ZZ possiblePrime, long numberOfTests) {
         for (j; j <= r; ++j) {
 
             // not need to calculate a^(q * 2^r) because remainder = a^q and 2^r is calculated cumulatively
-
-            remainder = PowerMod(remainder, 2, possiblePrime);
+            remainder = powerMod(remainder, base, possiblePrime);
             if (remainder == (possiblePrime - 1)) {
                 break;
             }
